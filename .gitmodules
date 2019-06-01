@@ -1,0 +1,3 @@
+[submodule "libHttp"]
+	path = libHttp
+	url = https://github.com/ohagendorf/libHttp.git
