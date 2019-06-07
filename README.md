@@ -1,8 +1,8 @@
-# ThingSpeak Communication Library for Arduino, ESP8266 and ESP32
+# ThingSpeak Communication Library for ~~Arduino, ESP8266 and ESP32~~ Mbed OS
 
-This library enables an Arduino or other compatible hardware to write or read data to or from ThingSpeak, an open data platform for the Internet of Things with MATLAB analytics and visualization.
+This library enables an Mbed compatible board to write or read data to or from ThingSpeak, an open data platform for the Internet of Things with MATLAB analytics and visualization.
 
-Hardware specific <a href="http://github.com/mathworks/thingspeak-arduino/tree/master/examples">examples</a> are found here. But to give you an idea of usage examples for <a href="#typical_write">writing</a> and <a href="#typical_read">reading</a> with an ESP8266 are shown below. Complete <a href="#documentation">documentation</a> in aslo shown below.
+Examples are found here. But to give you an idea of usage examples for <a href="#typical_write">writing</a> and <a href="#typical_read">reading</a> are shown below. Complete <a href="#documentation">documentation</a> in also shown below.
 
 ThingSpeak offers free data storage and analysis of time-stamped numeric or alphanumeric data. Users can access ThingSpeak by visiting http://thingspeak.com and creating a ThingSpeak user account.
 
@@ -25,30 +25,18 @@ In the Arduino IDE, choose Sketch/Include Library/Manage Libraries.  Click the T
 
 ## Compatible Hardware:
 
-* Arduino/Genuino or compatible using a WiFi Shield
-* Arduino/Genuino or compatible using a WiFi Shield 101 (Use the WiFi101 library version 0.13.0 or older.)
-* Arduino/Genuino or compatible using an Ethernet Shield
-* Arduino/Genuino or compatible using a MKR ETH Shield
-* Arduino MKR1000 
-* Arduino MKR1010
-* Arduino VIDOR 4000
-* Arduino GSM 14000
-* Arduino Uno WiFi Rev2
-* Arduino Yún (Rev1 and Rev2)
-* ESP8266 programming directly (tested with SparkFun ESP8266 Thing - Dev Board and NodeMCU 1.0 module)
-* ESP8266 via AT commands 
-* ESP32 (tested with SparkFun ESP32 Thing)
+Examples Tested with NUCLEO_F767 - an Mbed compatible board with ethernet connection. With minor adaption of network initialization code other network connectable boards should be working as well.
 
 # Examples
 
-The library includes several <a href="http://github.com/mathworks/thingspeak-arduino/tree/master/examples">examples organized by board type</a> to help you get started. These are accessible in Examples > ThingSpeak menu of the Arduino IDE.
+The library includes several <a href="http://github.com/mathworks/thingspeak-arduino/tree/master/examples">examples</a> to help you get started.
 
 * **ReadField:** Reading from a public channel and a private channel on ThingSpeak.
 * **WriteSingleField:** Writing a value to a single field on ThingSpeak.
 * **WriteMultipleFields:** Writing values to multiple fields and status in one transaction with ThingSpeak.
 
 ## <a id="typical_write">Typical Write Example</a>
-In this case, write to a field with an ESP8266 with an incrementing number.   
+In this case, write to a field with an incrementing number.   
 
 ```
 #include "ThingSpeak.h"
