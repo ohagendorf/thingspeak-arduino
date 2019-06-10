@@ -1,3 +1,9 @@
 [submodule "libHttp"]
 	path = libHttp
 	url = https://github.com/ohagendorf/libHttp.git
+[submodule "mbed-os-5.12.4"]
+	path = mbed-os-5.12.4
+	url = https://github.com/ARMmbed/mbed-os.git
+[submodule "mbed-os-5.11.2"]
+	path = mbed-os-5.11.2
+	url = https://github.com/ARMmbed/mbed-os.git
