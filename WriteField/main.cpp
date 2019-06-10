@@ -29,6 +29,7 @@
 #include "ThingSpeak.h"
 #include "EthernetInterface.h"
 
+
 Serial pc(USBTX, USBRX);
 NetworkInterface *net;
 ThingSpeak thingSpeak;
@@ -52,7 +53,7 @@ int setup() {
   net = new EthernetInterface();
 
   if (!net) {
-      pc.printf("Error! No network interface found.\n");
+      pc.printf("Error! No network inteface found.\n");
       return -1;
   }
 
@@ -82,38 +83,29 @@ int setup() {
   return 0;
 }
 
+#define SECRET_CH_ID 719728
+#define SECRET_WRITE_APIKEY "U48IWT4797KKLW29"
+
 void loop() {
+  static uint8_t number=0;
 
-  int statusCode = 0;
-
-  // Read in field 4 of the public channel recording the temperature
-  float fTemperatureInF = thingSpeak.readFloatField(weatherStationChannelNumber, temperatureFieldNumber);
-  String sTemperatureInF = thingSpeak.readStringField(weatherStationChannelNumber, temperatureFieldNumber);
-
-  // Check the status of the read operation to see if it was successful
-  statusCode = thingSpeak.getLastReadStatus();
-  if(statusCode == 200){
-    pc.printf("Temperature at MathWorks HQ: %s deg F\n", sTemperatureInF.c_str());
-    pc.printf("Temperature at MathWorks HQ: %f deg F\n", fTemperatureInF);
-  } else{
-    pc.printf("Problem reading channel. HTTP error code %d\n", statusCode);
-  }
-
-  wait(15); // No need to read the temperature too often.
-
-  // Read in field 1 of the private channel which is a counter
-  long count = thingSpeak.readLongField(counterChannelNumber, counterFieldNumber, myCounterReadAPIKey);
-
-   // Check the status of the read operation to see if it was successful
-  statusCode = thingSpeak.getLastReadStatus();
-  if(statusCode == 200){
-    pc.printf("Counter: %ld\n", count);
+  // Write to ThingSpeak. There are up to 8 fields in a channel, allowing you to store up to 8 different
+  // pieces of information in a channel.  Here, we write to field 1.
+  int x = thingSpeak.writeField(SECRET_CH_ID, 1, number, SECRET_WRITE_APIKEY);
+  if(x == 200){
+    pc.printf("Channel update successful.\n");
   }
   else{
-    pc.printf("Problem reading channel. HTTP error code %d\n", statusCode);
+    pc.printf("Problem updating channel. HTTP error code %d\n",x);
   }
 
-  wait(15); // No need to read the counter too often.
+  // change the value
+  number++;
+  if(number > 99){
+    number = 0;
+  }
+
+  wait(20); // Wait 20 seconds to update the channel again
 }
 
 int main() {
