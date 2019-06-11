@@ -25,42 +25,37 @@
 
 #include "mbed.h"
 #include "EthernetInterface.h"
+
 #include "WString.h"
-#include "secrets.h"
+
 //#define THINGSPEAK_DBG_MSG
 //#define THINGSPEAK_DBG_HTTP
 #include "ThingSpeak.h"
+#include "secrets.h"
+
 
 Serial pc(USBTX, USBRX);
 NetworkInterface *net;
 ThingSpeak thingSpeak;
 TCPSocket socket;
 
-// Weather station channel details
-unsigned long weatherStationChannelNumber = SECRET_CH_ID_WEATHER_STATION;
-unsigned int temperatureFieldNumber = 4;
-
-// Counting channel details
-unsigned long counterChannelNumber = SECRET_CH_ID_COUNTER;
-const char * myCounterReadAPIKey = SECRET_READ_APIKEY_COUNTER;
-unsigned int counterFieldNumber = 1;
-nsapi_size_or_error_t result;
-
 int setup() {
+  nsapi_size_or_error_t result;
+
 #ifdef MBED_MAJOR_VERSION
   pc.printf("Mbed OS version: %d.%d.%d\n\n", MBED_MAJOR_VERSION, MBED_MINOR_VERSION, MBED_PATCH_VERSION);
 #endif
 
   net = new EthernetInterface();
   if (!net) {
-      pc.printf("Error! No network interface found.\n");
-      return -1;
+    pc.printf("Error! No network inteface found.\n");
+    return -1;
   }
 
   result = net->connect();
   if (result != 0) {
-      pc.printf("Error! net->connect() returned: %d\n", result);
-      return result;
+    pc.printf("Error! net->connect() returned: %d\n", result);
+    return result;
   }
 
   // Show the network address
@@ -73,8 +68,8 @@ int setup() {
 
   nsapi_error_t open_result = socket.open(net);
   if (open_result != 0) {
-      pc.printf("Error! socket.open(net) returned: %d\n", open_result);
-      return open_result;
+    pc.printf("Error! socket.open(net) returned: %d\n", open_result);
+    return open_result;
   }
 
   thingSpeak.setSerial(&pc);
@@ -84,37 +79,37 @@ int setup() {
 }
 
 void loop() {
+  static uint8_t number1=0;
+  static uint8_t number2=0;
+  static uint8_t number3=0;
+  static uint8_t number4=0;
 
-  int statusCode = 0;
+  // set the fields with the values
+  thingSpeak.setField(1, number1);
+  thingSpeak.setField(2, number2);
+  thingSpeak.setField(3, number3);
+  thingSpeak.setField(4, number4);
 
-  // Read in field 4 of the public channel recording the temperature
-  float fTemperatureInF = thingSpeak.readFloatField(weatherStationChannelNumber, temperatureFieldNumber);
-  String sTemperatureInF = thingSpeak.readStringField(weatherStationChannelNumber, temperatureFieldNumber);
 
-  // Check the status of the read operation to see if it was successful
-  statusCode = thingSpeak.getLastReadStatus();
-  if(statusCode == 200){
-    pc.printf("Temperature at MathWorks HQ: %s deg F\n", sTemperatureInF.c_str());
-    pc.printf("Temperature at MathWorks HQ: %f deg F\n", fTemperatureInF);
-  } else{
-    pc.printf("Problem reading channel. HTTP error code %d\n", statusCode);
-  }
-
-  wait(15); // No need to read the temperature too often.
-
-  // Read in field 1 of the private channel which is a counter
-  long count = thingSpeak.readLongField(counterChannelNumber, counterFieldNumber, myCounterReadAPIKey);
-
-   // Check the status of the read operation to see if it was successful
-  statusCode = thingSpeak.getLastReadStatus();
-  if(statusCode == 200){
-    pc.printf("Counter: %ld\n", count);
+  // write to the ThingSpeak channel
+  int x = thingSpeak.writeFields(SECRET_CH_ID, SECRET_WRITE_APIKEY);
+  if(x == 200){
+    pc.printf("Channel update successful.\n");
   }
   else{
-    pc.printf("Problem reading channel. HTTP error code %d\n", statusCode);
+    pc.printf("Problem updating channel. HTTP error code %d\n", x);
   }
 
-  wait(15); // No need to read the counter too often.
+  // change the values
+  number1++;
+  if(number1 > 99){
+    number1 = 0;
+  }
+  number2 = rand()%100;
+  number3 = rand()%100;
+  number4 = rand()%100;
+
+  wait(20); // Wait 20 seconds to update the channel again
 }
 
 int main() {

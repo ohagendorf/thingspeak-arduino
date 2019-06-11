@@ -13,8 +13,12 @@
   See the accompaning licence file for licensing information.
 */
 
+#ifdef THINGSPEAK_DBG_MSG
 #define PRINT_DEBUG_MESSAGES
+#endif
+#ifdef THINGSPEAK_DBG_HTTP
 #define PRINT_HTTP
+#endif
 
 #ifndef ThingSpeak_h
 #define ThingSpeak_h
@@ -1476,16 +1480,18 @@ private:
     if(!this->connected)
       result = socket->connect(THINGSPEAK_URL, this->port);
 
-    #ifdef PRINT_DEBUG_MESSAGES
     if (!result || connected) {
-      serial->printf("Success.\n");
+      #ifdef PRINT_DEBUG_MESSAGES
+        serial->printf("Success.\n");
+      #endif
       this->connected = true;
       return true;
     } else {
-      serial->printf("Failed (%d).\n", result);
+      #ifdef PRINT_DEBUG_MESSAGES
+        serial->printf("Failed (%d).\n", result);
+      #endif
       return false;
     }
-    #endif
   };
 
   int convertFloatToChar(float value, char *valueString) {

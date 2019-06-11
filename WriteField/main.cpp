@@ -24,11 +24,13 @@
 */
 
 #include "mbed.h"
-#include "WString.h"
-#include "secrets.h"
-#include "ThingSpeak.h"
 #include "EthernetInterface.h"
 
+#include "WString.h"
+#include "secrets.h"
+//#define THINGSPEAK_DBG_MSG
+//#define THINGSPEAK_DBG_HTTP
+#include "ThingSpeak.h"
 
 Serial pc(USBTX, USBRX);
 NetworkInterface *net;
@@ -51,7 +53,6 @@ int setup() {
 #endif
 
   net = new EthernetInterface();
-
   if (!net) {
       pc.printf("Error! No network inteface found.\n");
       return -1;
@@ -109,7 +110,7 @@ void loop() {
 }
 
 int main() {
-  if(setup() != 0) 
+  if(setup() == 0) 
     while(true) loop();
   else
     while(true) wait(1);

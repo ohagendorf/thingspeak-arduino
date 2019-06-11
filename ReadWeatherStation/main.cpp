@@ -25,11 +25,14 @@
 
 #include "mbed.h"
 #include "EthernetInterface.h"
+
 #include "WString.h"
 #include "secrets.h"
+
 //#define THINGSPEAK_DBG_MSG
 //#define THINGSPEAK_DBG_HTTP
 #include "ThingSpeak.h"
+
 
 Serial pc(USBTX, USBRX);
 NetworkInterface *net;
@@ -53,14 +56,14 @@ int setup() {
 
   net = new EthernetInterface();
   if (!net) {
-      pc.printf("Error! No network interface found.\n");
-      return -1;
+    pc.printf("Error! No network inteface found.\n");
+    return -1;
   }
 
   result = net->connect();
   if (result != 0) {
-      pc.printf("Error! net->connect() returned: %d\n", result);
-      return result;
+    pc.printf("Error! net->connect() returned: %d\n", result);
+    return result;
   }
 
   // Show the network address
@@ -73,8 +76,8 @@ int setup() {
 
   nsapi_error_t open_result = socket.open(net);
   if (open_result != 0) {
-      pc.printf("Error! socket.open(net) returned: %d\n", open_result);
-      return open_result;
+    pc.printf("Error! socket.open(net) returned: %d\n", open_result);
+    return open_result;
   }
 
   thingSpeak.setSerial(&pc);
@@ -84,37 +87,24 @@ int setup() {
 }
 
 void loop() {
+  // Mathworks Weatherstaion Dashboard: https://thingspeak.com/channels/12397
+  float windDirection = thingSpeak.readFloatField(weatherStationChannelNumber,1);
+  float windSpeed = thingSpeak.readFloatField(weatherStationChannelNumber,2);
+  float humidity = thingSpeak.readFloatField(weatherStationChannelNumber,3);
+  float temperature = thingSpeak.readFloatField(weatherStationChannelNumber,4);
+  float rainfall = thingSpeak.readFloatField(weatherStationChannelNumber,5);
+  float pressure = thingSpeak.readFloatField(weatherStationChannelNumber,6);
 
-  int statusCode = 0;
-
-  // Read in field 4 of the public channel recording the temperature
-  float fTemperatureInF = thingSpeak.readFloatField(weatherStationChannelNumber, temperatureFieldNumber);
-  String sTemperatureInF = thingSpeak.readStringField(weatherStationChannelNumber, temperatureFieldNumber);
-
-  // Check the status of the read operation to see if it was successful
-  statusCode = thingSpeak.getLastReadStatus();
-  if(statusCode == 200){
-    pc.printf("Temperature at MathWorks HQ: %s deg F\n", sTemperatureInF.c_str());
-    pc.printf("Temperature at MathWorks HQ: %f deg F\n", fTemperatureInF);
-  } else{
-    pc.printf("Problem reading channel. HTTP error code %d\n", statusCode);
+  pc.printf("Current weather conditions in Natick: \n");
+  pc.printf("%f degrees F, %f%% humidity\n", temperature, humidity);
+  pc.printf("Wind at %f MPH at %f degrees\n", windSpeed, windDirection);
+  if(rainfall > 0) {
+    pc.printf("Pressure is %f inHg, and it's raining\n", pressure);
+  } else {
+    pc.printf("Pressure is %f inHg\n", pressure);
   }
 
-  wait(15); // No need to read the temperature too often.
-
-  // Read in field 1 of the private channel which is a counter
-  long count = thingSpeak.readLongField(counterChannelNumber, counterFieldNumber, myCounterReadAPIKey);
-
-   // Check the status of the read operation to see if it was successful
-  statusCode = thingSpeak.getLastReadStatus();
-  if(statusCode == 200){
-    pc.printf("Counter: %ld\n", count);
-  }
-  else{
-    pc.printf("Problem reading channel. HTTP error code %d\n", statusCode);
-  }
-
-  wait(15); // No need to read the counter too often.
+  wait(15); // Note that the weather station only updates once a minute
 }
 
 int main() {

@@ -1,1 +1,11 @@
 *.bak
+*.uvprojx
+*.uvoptx
+*.oh
+WriteField/DebugConfig/
+mbed_config.h
+*.dbgconf
+GettingStarted.html
+.link_script.sct
+*.scvd
+mbed_config.h
